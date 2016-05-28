@@ -1,0 +1,17 @@
+/**
+ * Created by ockifals on 01/11/15.
+ */
+
+.content {
+    min-height: 500px;
+}
+
+.search-ticket-box {
+    position: relative;
+    border-radius: 0;
+    background: none;
+    border-top: none;
+    margin-bottom: 20px;
+    width: 100%;
+    box-shadow: none;
+}
