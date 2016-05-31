@@ -99,9 +99,20 @@
                     success: function (data) {
                         Cookies.set('credential', data, { expires: 7, path: 'localhost/epulsa-client' });
 
+                        var username = null;
+                        var user_type = null;
+
+                        if ("user" in data.user) {
+                            username = data.user.user.username;
+                            user_type = data.user.type;
+                        } else {
+                            username = data.user.username;
+                            user_type = 1;
+                        }
+
                         // similar behavior as an HTTP redirect
                         window.location.replace("validate?id=" + data.user.id + 
-                            "&username=" + data.user.user.username + "&type=" + data.user.type +
+                            "&username=" + username + "&type=" + user_type +
                             "&token=" + data.token);
                     },
                     error: function (er) {

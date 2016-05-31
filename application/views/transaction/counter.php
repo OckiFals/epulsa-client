@@ -40,10 +40,10 @@ date_default_timezone_set('Asia/Jakarta');
                             <table id="order-list" class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
+                                    <th>Transaction ID</th>
                                     <th>Order ID</th>
-                                    <th>Phone</th>
-                                    <th>Purchase</th>
-                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Time</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -51,10 +51,10 @@ date_default_timezone_set('Asia/Jakarta');
                                 </tbody>
                                 <tfoot>
                                 <tr>
+                                    <th>Transaction ID</th>
                                     <th>Order ID</th>
-                                    <th>Phone</th>
-                                    <th>Purchase</th>
-                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Time</th>
                                 </tr>
                                 </tfoot>
                             </table>
@@ -179,6 +179,30 @@ date_default_timezone_set('Asia/Jakarta');
 
         var interval = window.setInterval(function(){orderStreams()}, 1000);
 
+        $.ajax({
+            url: "http://localhost:8080/transaction/order",
+            headers: {
+                    Authorization: "JWT " + kuki.token 
+            },
+            success: function (data) {
+                window.setTimeout(function () {
+                    $.each(data, function (index, obj) {
+                        order_table.row.add([
+                            // col 1
+                            obj.id,
+                                    // col 2
+                            obj.order,
+                                    // col 3
+                            obj.total,
+                                    // col 4
+                            obj.time
+                        ]).draw();
+                    });
+                    loading_indicator.remove();
+                }, 500);
+                window.clearInterval(interval);
+            }
+        });
         function orderStreams() {
             $.ajax({
                 url: 'http://localhost:8080/order/streams/',
@@ -193,23 +217,6 @@ date_default_timezone_set('Asia/Jakarta');
                         modal.find("#customer-id").text(data[data.length-1].customer);
                         modal.find("#order-purchase").text(data[data.length-1].purchase);
                         modal.modal('show');
-
-                        window.setTimeout(function () {
-                            $.each(data, function (index, obj) {
-                                order_table.row.add([
-                                    // col 1
-                                    obj.id,
-                                    // col 2
-                                    obj.phone_number,
-                                    // col 3
-                                    obj.purchase,
-                                    // col 4
-                                    '<span class="label label-info">New</span>'
-                                ]).draw();
-                            });
-                            loading_indicator.remove();
-                        }, 500);
-                        window.clearInterval(interval);
                     } else {
                         loading_indicator.remove();
                     }
@@ -221,7 +228,6 @@ date_default_timezone_set('Asia/Jakarta');
         }
 
         modal.find('.btn-ok').click(function () {
-            order_table.clear();
             $.ajax({
                 url: 'http://localhost:8080/transaction/order',
                 type: 'post',
@@ -236,12 +242,7 @@ date_default_timezone_set('Asia/Jakarta');
                 success: function (data) {
                     kuki.user.saldo = parseInt(kuki.user.saldo) - parseInt(modal.find('#order-purchase').text());
                     $('#saldo').text(kuki.user.saldo);
-
-                    Cookies.remove('credential', { path: 'localhost/epulsa-client' });
-                    Cookies.set('credential', kuki, { expires: 7, path: 'localhost/epulsa-client' });
-
-                    order_table.clear();
-                    interval = window.setInterval(function(){orderStreams()}, 5000);
+                    interval = window.setInterval(function(){orderStreams()}, 1000);
                 },
                 error: function (er) {
                     console.log(er);
@@ -251,8 +252,7 @@ date_default_timezone_set('Asia/Jakarta');
         });
 
         modal.find('.btn-cancel').click(function () {
-            interval = window.setInterval(function(){orderStreams()}, 5000);
-            order_table.clear();
+            interval = window.setInterval(function(){orderStreams()}, 1000);
             modal.modal('hide');
         });
 

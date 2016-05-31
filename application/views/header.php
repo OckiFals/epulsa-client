@@ -59,7 +59,8 @@
 
                                 <p>
                                     <?php echo $this->session->userdata('username') ?> -
-                                    <?php echo (1 == $this->session->userdata('type')) ? 'admin' : 'counter' ?>
+                                    <?php echo (1 == $this->session->userdata('type')) ? 'admin' : 
+                                    (2 == $this->session->userdata('type')) ? 'counter' : 'customer' ?>
                                     <small>Member since Nov. 2012</small>
                                 </p>
                             </li>
@@ -120,54 +121,63 @@
                             <i class="fa fa-angle-left pull-right"></i>
                         </a>
                         <ul class="treeview-menu">
-                            <li <?php if ('Kelola Akun' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('account') ?>"><i class="fa fa-sitemap">
-                                </i> Lihat Semua Akun</a>
+                            <li <?php if (strrpos($title, "Admin")) echo 'class="active"'?>>
+                                <a href="#"><i class="fa fa-circle-o">
+                                    </i> Admin <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li <?php if ('Kelola Akun Admin' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/admin') ?>"><i class="fa fa-sitemap">
+                                        </i> Lihat Semua Admin</a>
+                                    </li>
+                                    <li <?php if ('Tambah Akun Admin' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/admin/add') ?>" rel="tab"><i class="fa fa-plus-square">
+                                        </i> Tambah Admin</a>
+                                    </li>
+                                </ul>
                             </li>
-                            <li <?php if ('Tambah Akun' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('account/add') ?>" rel="tab"><i class="fa fa-plus-square">
-                                </i> Tambah Akun</a>
+                            <li <?php if (strrpos($title, "Konter")) echo 'class="active"'?>>
+                                <a href="#"><i class="fa fa-circle-o">
+                                    </i> Konter <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                     <li <?php if ('Kelola Akun Konter' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/counter') ?>"><i class="fa fa-sitemap">
+                                        </i> Lihat Semua Konter</a>
+                                    </li>
+                                    <li <?php if ('Tambah Akun Konter' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/counter/add') ?>" rel="tab"><i class="fa fa-plus-square">
+                                        </i> Tambah Pengguna</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li <?php if (strrpos($title, "Pengguna")) echo 'class="active"'?>>
+                                <a href="#"><i class="fa fa-circle-o">
+                                    </i> Pengguna <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                     <li <?php if ('Kelola Akun Pengguna' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/customer') ?>"><i class="fa fa-sitemap">
+                                        </i> Lihat Semua Pengguna</a>
+                                    </li>
+                                    <li <?php if ('Tambah Akun Pengguna' == $title) echo 'class="active"'?>>
+                                        <a href="<?php echo base_url('account/customer/add') ?>" rel="tab"><i class="fa fa-plus-square">
+                                        </i> Tambah Pengguna</a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </li>
-                    <li class="treeview <?php if (strpos($title, 'Bus') && !strpos($title, 'Jadwal')) echo 'active'?>">
-                        <a href="#">
-                            <!-- fa-map-marker -->
-                            <i class="fa fa-road"></i> <span>Kelola Bus</span>
-                            <i class="fa fa-angle-left pull-right"></i>
+                    <li class="<?php if ($title == 'Isi Saldo') echo 'active'?>">
+                        <a href="<?php echo base_url('admin/isisaldo') ?>">
+                            <i class="fa fa-book"></i> <span>Isi Saldo</span>
                         </a>
-                        <ul class="treeview-menu">
-                            <li <?php if ('Kelola Bus' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('bus') ?>"><i class="fa fa-sitemap">
-                                </i> Lihat Semua Data Bus</a>
-                            </li>
-                            <li <?php if ('Tambah Data Bus' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('bus/add') ?>"><i class="fa fa-plus-square">
-                                </i> Tambah Data Bus</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="treeview <?php if (strpos($title, 'Jadwal')) echo 'active'?>">
-                        <a href="#">
-                            <i class="fa fa-book"></i> <span>Kelola Jadwal Bus</span>
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li <?php if ('Kelola Jadwal Bus' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('schedule') ?>"><i class="fa fa-sitemap">
-                                </i> Lihat Semua Jadwal Bus</a>
-                            </li>
-                            <li <?php if ('Tambah Jadwal Bus' == $title) echo 'class="active"'?>>
-                                <a href="<?php echo base_url('schedule/add') ?>"><i class="fa fa-plus-square">
-                                </i> Tambah Jadwal Bus</a>
-                            </li>
-                        </ul>
                     </li>
                     <!-- / menu untuk admin -->
                 <?php elseif (2 == $this->session->userdata('type')): ?>
                     <!--  menu  untuk counter -->
                     <li <?php if ('Order' == $title) echo 'class="active"'?>>
-                        <a href="<?php echo base_url('order') ?>">
+                        <a href="<?php echo base_url('transaction/counter') ?>">
                             <i class="fa fa-file-text"></i>
                             <span>Transaksi</span>
                         </a>
@@ -182,7 +192,7 @@
                         </a>
                     </li>
                     <li <?php if ('Transaksi' == $title) echo 'class="active"'?>>
-                        <a href="<?php echo base_url('transaction') ?>">
+                        <a href="<?php echo base_url('transaction/customer') ?>">
                             <i class="fa fa-check-square"></i>
                             <span>Transaksi</span>
                         </a>

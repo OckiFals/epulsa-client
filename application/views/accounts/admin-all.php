@@ -3,7 +3,7 @@
  * @var stdClass $accounts
  */
 ?>
-<?php $this->load->view('header', ['title' => 'Kelola Akun']) ?>
+<?php $this->load->view('header', ['title' => 'Kelola Akun Admin']) ?>
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -13,7 +13,7 @@
             </h1>
             <ol class="breadcrumb">
                 <li><a href="<?php echo base_url() ?>"><i class="fa fa-dashboard"></i> Beranda</a></li>
-                <li class="active"><i class="fa fa-users"></i> Semua Akun</li>
+                <li class="active"><i class="fa fa-users"></i> Semua Admin</li>
             </ol>
         </section>
 
@@ -42,12 +42,12 @@
                     <div id="contentHolder">
                         <div class="box box-info" id="contentData">
                             <div class="box-header with-border">
-                                <h3 class="box-title">Semua Akun</h3>
+                                <h3 class="box-title">Semua Admin</h3>
 
                                 <div class="box-tools pull-right">
-                                    <a href="<?php echo base_url('account/add') ?>" class="btn btn-info btn-sm btn-flat"
+                                    <a href="<?php echo base_url('account/admin/add') ?>" class="btn btn-info btn-sm btn-flat"
                                        rel="tab">
-                                        <i class="fa fa-plus"></i> Tambah Akun
+                                        <i class="fa fa-plus"></i> Tambah Admn
                                     </a>
                                 </div>
                             </div>
@@ -58,9 +58,9 @@
                                         <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Nama Akun</th>
-                                            <th>Tipe</th>
-                                            <th>Tanggal Buat</th>
+                                            <th>Username</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
                                             <th width="150px">Aksi</th>
                                         </tr>
                                         </thead>
@@ -151,61 +151,53 @@
 
     <script type="application/javascript">
         $(document).ready(function () {
-            var account_table = $('#account-list').DataTable({
-                "order": [2, "asc"]
-            });
+            var account_table = $('#account-list').DataTable();
             var loading_indicator = $('#load-animate');
             var confirm_modal = $('#confirm-delete');
             var flash_message = $('#flash-message');
 
             renderFlashInfo();
             
-            // iterasi stdClass data ke dalam object javascript
-            var data = [
-                <?php foreach ($accounts as $index => $account): ?>
-                {
-                    id: <?php echo "'{$account->id}'" ?>,
-                    img: <?php echo (1 == $account->type) ? "'img/accounts/meteor.png'" : "'img/accounts/moon.png'" ?>,
-                    name: <?php echo "'{$account->name}'" ?>,
-                    type: <?php echo (1 == $account->type) ? "'Admin'" : "'Agent'" ?>,
-                    created_at: <?php echo "'{$account->created_at}'" ?>
+            var kuki = Cookies.getJSON('credential');
+
+            $.ajax({
+                url: "http://localhost:8080/user/admin/",
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    Authorization: "JWT " + kuki.token 
                 },
-                <?php endforeach; ?>
-            ];
-            
-            window.setTimeout(function () {
-                render_data(data);
-                loading_indicator.remove();
-            }, 500);
-
-            function render_data(data) {
-                $.each(data, function (index, obj) {
-                    account_table.row.add([
-                        // col 1
-                        ' <img src="<?php echo base_url('assets') ?>/' + obj.img + ' " alt="account image" ' +
-                        ' class="img-responsive img-circle center-block" width="40px" height="40px"/> ' +
-                        ' <span id="account-' + obj.id + '" style="text-align: center" class="center-block"> @' + obj.id + '</span> ',
-                        // col 2
-                        obj.name,
-                        // col 3
-                        obj.type,
-                        // col 4
-                        ' <span class="badge bg-primary"><i class="fa  fa-clock-o"></i> ' +
-                        obj.created_at +
-                        '</span>',
-                        // col 5
-                        ' <a href="account/edit/' + obj.id + '" class="btn btn-xs btn-flat btn-primary"> ' +
-                        ' <i class="fa fa-edit "></i> Ubah ' +
-                        ' </a> ' + "\n" +
-                        ' <a href="#" class="btn btn-xs btn-flat btn-danger" data-account-id="' + obj.id + '" ' +
-                        ' data-type-modal="User" data-account-name=" ' + obj.name + ' " ' +
-                        ' data-toggle="modal" data-href="#"' +
-                        ' data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Hapus' +
-                        ' </a>'
-                    ]).draw();
-                });
-
-            }
+                success: function (data) {
+                    window.setTimeout(function () {
+                        $.each(data, function (index, obj) {
+                            account_table.row.add([
+                                // col 1
+                                ' <span id="account-' + obj.id + '" style="text-align: center" class="center-block">' + obj.id + '</span> ',
+                                // col 2
+                                obj.username,
+                                // col 3
+                                obj.first_name,
+                                // col 4
+                                obj.last_name,
+                                // col 5
+                                ' <a href="admin/edit/' + obj.id + 
+                                '" class="btn btn-xs btn-flat btn-primary"> ' +
+                                ' <i class="fa fa-edit "></i> Ubah ' +
+                                ' </a> ' + "\n" +
+                                ' <a href="#" class="btn btn-xs btn-flat btn-danger" data-account-id="' + obj.id + '" ' +
+                                ' data-type-modal="User" data-account-name=" ' + obj.username + ' " ' +
+                                ' data-toggle="modal" data-href="#"' +
+                                ' data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Hapus' +
+                                ' </a>'
+                            ]).draw();
+                        });
+                        loading_indicator.hide();
+                    }, 500);
+                },
+                error: function (er) {
+                    console.log(er)
+                }
+            });
 
             function hideFlashMessage() {
                 flash_message.fadeOut('normal');
@@ -244,11 +236,16 @@
                 var target = '#account-' + btn_target.data('account-id');
 
                 // memastikan bahwa akun yang dihapus bukanlah admin utama
-                if ('#account-root' !== target) {
+                if ('#account-1' !== target) {
                     $.ajax({
-                        url: 'account/delete/' + btn_target.data('account-id')
+                        url: "http://localhost:8080/user/admin/" + btn_target.data('account-id') + '/',
+                        type: "DELETE",
+                        dataType: "json",
+                        headers: {
+                            Authorization: "JWT " + kuki.token 
+                        },
                     }).done(function (msg) {
-                        flash_message.find('#flash-message-data').html(msg);
+                        flash_message.find('#flash-message-data').html("Akun berhasil dihapus");
                         flash_message.fadeIn('normal');
                         window.setTimeout(hideFlashMessage, 4000);
 

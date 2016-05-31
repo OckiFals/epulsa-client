@@ -1,4 +1,4 @@
-<?php $this->load->view('header', ['title' => 'Order']) ?>
+<?php $this->load->view('header', ['title' => 'Isi Saldo']) ?>
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -8,7 +8,7 @@
             </h1>
             <ol class="breadcrumb">
                 <li><a href="<?php echo base_url('') ?>"><i class="fa fa-dashboard"></i> Beranda</a></li>
-                <li class="active"><i class="fa fa-edit"></i> Order</li>
+                <li class="active"><i class="fa fa-edit"></i> Isi Saldo</li>
             </ol>
         </section>
 
@@ -37,24 +37,24 @@
                     <div id="contentHolder">
                         <div class="box box-info" id="contentData">
                             <div class="box-header with-border">
-                                <h3 class="box-title">Order</h3>
+                                <h3 class="box-title">Isi Saldo Pengguna</h3>
                             </div>
                             <!-- /.box-header -->
                             <div class="box-body">
                                 <div class="register-box-body">
                                     <p class="login-box-msg">Isi form berikut</p>
 
-                                    <form action="" method="POST" id="order-form"
+                                    <form action="" method="POST" id="isi-saldo-form"
                                           novalidate="novalidate">
                                         <div class="form-group has-feedback">
-                                            <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                                            <input id="phone" name="phone" class="form-control" placeholder="Nomor Telepon"
-                                                   type="text">
+                                            <select class="form-control" id="customer" name="customer">
+                                                <option value="">Pilih Customer</option>
+                                            </select>
                                         </div>
                                         <div class="form-group has-feedback">
-                                            <select class="form-control" id="purchase" name="purchase">
-                                                <option value="">Pilih Harga</option>
-                                            </select>
+                                            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                                            <input id="saldo" name="saldo" class="form-control" placeholder="Saldo"
+                                                   type="text">
                                         </div>
 
                                         <div class="form-group has-feedback">
@@ -156,28 +156,27 @@
             $("#calendar").datepicker('setDate', 'today');
             var flash_message = $('#flash-message');
 
-            form = $("#order-form");
+            form = $("#isi-saldo-form");
 
             // ambil data dari kuki
             var kuki = Cookies.getJSON('credential');
-            // atur nomor telepon default
-            form.find('#phone').val(kuki.user.phone);
 
-            $('#saldo').text(kuki.user.saldo);
-
-            // saldo yang tersedia
-            var available_saldo = [5000, 10000, 25000, 50000, 100000];
-            // ambil data user saldo dari kuki
-            var user_saldo = kuki.user.saldo;
-
-            // tambahkan opsi harga berdasarkan saldo yang dimiliki user
-            // opsi yang ditambahkan hanya jika saldo user lebih besar dari index yang diiterasi
-            for (var i = 0; i < available_saldo.length; i++) {
-                if (user_saldo >= available_saldo[i])
-                    form.find('#purchase').append($("<option></option>")
-                        .attr("value", available_saldo[i])
-                        .text(available_saldo[i])); 
-            }
+            $.ajax({
+                url: 'http://localhost:8080/user/customer/',      
+                headers: {
+                    Authorization: "JWT " + kuki.token 
+                },
+                success: function (data) {
+                    $.each(data, function (index, obj) {
+                        form.find('#customer').append($("<option></option>")
+                            .attr("value", obj.id)
+                            .text(obj.user.username)); 
+                    });
+                },
+                error: function (data) {
+                    console.log(error);
+                }
+            });
 
             $(form).submit(function(e) {
                 e.preventDefault();
@@ -185,69 +184,46 @@
 
                 // Specify the validation rules
                 rules: {
-                    phone: "required",
-                    purchase: {
+                    customer: "required",
+                    saldo: {
                         required: true
                     }
                 },
 
                 // Specify the validation error messages
                 messages: {
-                    phone: "Tolong ketikkan nomor telepon",
-                    purchase: {
-                        required: "Tolong pilih harga"
+                    customer: "Tolong pilih customer",
+                    saldo: {
+                        required: "Tolong isi saldo"
                     }
                 },
 
                 submitHandler: function (f) {
                     // mendapatkan konter id yang dipilih secara bergantian
                     $.ajax({
-                        url: 'http://localhost:8080/order/counter-turn?order=' +
-                            document.getElementById('purchase').value,
-                        success: function (data) {
-                            console.log(data)
-                            document.getElementById('counter_id').value = data.counter;
-                        },
-                        error: function (er) {
-                            console.log(er);
-                        }
-                    });
-
-                    $.ajax({
-                        url: 'http://localhost:8080/order/',
-                        type: 'post',
+                        url: 'http://localhost:8080/user/customer/' + $('#customer option:selected').val() + '/',
+                        type: 'PUT',
                         data: {
-                            phone_number: document.getElementById('phone').value,
-                            purchase: document.getElementById('purchase').value,
-                            counter: document.getElementById('counter_id').value
+                            saldo: parseInt(form.find('#saldo').val())
                         },
                         headers: {
                             Authorization: "JWT " + kuki.token 
                         },
-                        dataType: 'json',
                         success: function (data) {
-                            form.find('#phone').val(kuki.user.phone);
-                            renderFlashInfo('Order dengan id=' + data.id + " berhasil ditambahkan!");
-                            kuki.user.saldo = parseInt(kuki.user.saldo) - 
-                                parseInt($('#purchase option:selected').text());
-
-                            Cookies.remove('credential', { path: 'localhost/epulsa-client' });
-                            Cookies.set('credential', kuki, { expires: 7, path: 'localhost/epulsa-client' });
-
-                            $('#saldo').text(kuki.user.saldo);
-                            form[0].reset();
+                            renderFlashInfo(data);
                         },
                         error: function (er) {
-                            console.log(er)
-                            form[0].reset();
-                            form.find('#phone').val(kuki.user.phone);
+                            console.log(er);
                         }
                     });
                 }
             });
 
             function renderFlashInfo(eventInfo) {
-                flash_message.find('#flash-message-data').html(eventInfo);
+                flash_message.find('#flash-message-data').html(
+                    "Saldo Rp. " + form.find('#saldo').val() + " telah ditambahkan untuk pengguna " +
+                    "<strong>" + eventInfo.user.username + "</strong>!"
+                );
                 flash_message.fadeIn('normal');
                 window.setTimeout(hideFlashMessage, 4000);
             }

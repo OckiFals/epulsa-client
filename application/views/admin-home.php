@@ -30,26 +30,6 @@ date_default_timezone_set('Asia/Jakarta');
             <!-- Info boxes -->
             <div class="row">
                 <div class="col-md-8">
-                    <div class="box box-solid bg-light-blue-gradient">
-                        <div class="box-header ui-sortable-handle">
-                            <i class="fa fa-th"></i>
-
-                            <h3 class="box-title">Grafik Penjualan Tiket <?php echo date("Y"); ?></h3>
-
-                            <div class="box-tools pull-right">
-                                <button class="btn bg-light-blue btn-sm" data-widget="collapse"><i
-                                        class="fa fa-minus"></i></button>
-                                <button class="btn bg-light-blue btn-sm" data-widget="remove"><i
-                                        class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                        <div class="box-body border-radius-none">
-                            <canvas class="chart" id="salesChart" height="240" width="480">
-
-                            </canvas>
-                        </div>
-                        <!-- /.box-body -->
-                    </div>
 
                     <!-- TABLE: LATEST ORDERS -->
                     <div class="box box-info">
@@ -176,13 +156,7 @@ date_default_timezone_set('Asia/Jakarta');
             type="text/javascript"></script>
     <script src="<?php echo base_url('assets/plugins/datatables/dataTables.bootstrap.js') ?>"
             type="text/javascript"></script>
-    <script src="<?php echo base_url('assets/plugins/chartjs/Chart.min.js') ?>" type="text/javascript"></script>
     <!-- datepicker -->
     <script src="<?php echo base_url('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"
             type="text/javascript"></script>
-
-
-    <script type="text/javascript">
-        
-    </script>
 <?php $this->load->view('footer'); ?>

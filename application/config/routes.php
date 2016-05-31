@@ -59,6 +59,21 @@ $route['validate'] = 'Site/validate';
 $route['order'] = 'Site/order';
 $route['transaction'] = 'Site/transaction';
 
+# admin
+$route['account/admin'] = 'Admin/index';
+$route['account/admin/add'] = 'Admin/add';
+$route['account/admin/edit/(:num)'] = 'Admin/edit/$1';
+
+# Cutomer
+$route['account/customer'] = 'customer/index';
+$route['account/customer/add'] = 'customer/add';
+$route['account/customer/edit/(:num)'] = 'customer/edit/$1';
+
+# Counter
+$route['account/counter'] = 'counter/index';
+$route['account/counter/add'] = 'counter/add';
+$route['account/counter/edit/(:num)'] = 'counter/edit/$1';
+
 $route['search'] = 'Site/search';
 $route['pemesanan'] = 'Reservation/add';
 
