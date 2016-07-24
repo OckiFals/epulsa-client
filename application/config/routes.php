@@ -57,7 +57,6 @@ $route['login'] = 'Site/login';
 $route['logout'] = 'Site/logout';
 $route['validate'] = 'Site/validate';
 $route['order'] = 'Site/order';
-$route['transaction'] = 'Site/transaction';
 
 # admin
 $route['account/admin'] = 'Admin/index';
@@ -73,10 +72,3 @@ $route['account/customer/edit/(:num)'] = 'customer/edit/$1';
 $route['account/counter'] = 'counter/index';
 $route['account/counter/add'] = 'counter/add';
 $route['account/counter/edit/(:num)'] = 'counter/edit/$1';
-
-$route['search'] = 'Site/search';
-$route['pemesanan'] = 'Reservation/add';
-
-$route['konfirmasi-pembayaran'] = 'Reservation/confirmation';
-
-$route['print-ticket'] = 'ticket/export_pdf';

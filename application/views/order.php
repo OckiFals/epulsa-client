@@ -183,7 +183,7 @@
                 e.preventDefault();
             }).validate({
 
-                // Specify the validation rules
+                // atur form rule
                 rules: {
                     phone: "required",
                     purchase: {
@@ -191,7 +191,7 @@
                     }
                 },
 
-                // Specify the validation error messages
+                // atur pesan error pada form
                 messages: {
                     phone: "Tolong ketikkan nomor telepon",
                     purchase: {
@@ -206,6 +206,7 @@
                             document.getElementById('purchase').value,
                         success: function (data) {
                             console.log(data)
+                            // set konter id pada field 'hidden' dengan id=counter_id
                             document.getElementById('counter_id').value = data.counter;
                         },
                         error: function (er) {
@@ -213,6 +214,7 @@
                         }
                     });
 
+                    // kirim order
                     $.ajax({
                         url: 'http://localhost:8080/order/',
                         type: 'post',
@@ -227,15 +229,21 @@
                         dataType: 'json',
                         success: function (data) {
                             form.find('#phone').val(kuki.user.phone);
+                            // tampilkan informasi
                             renderFlashInfo('Order dengan id=' + data.id + " berhasil ditambahkan!");
                             kuki.user.saldo = parseInt(kuki.user.saldo) - 
                                 parseInt($('#purchase option:selected').text());
 
                             Cookies.remove('credential', { path: 'localhost/epulsa-client' });
+                            // perbarui kuki
                             Cookies.set('credential', kuki, { expires: 7, path: 'localhost/epulsa-client' });
 
+                            // perbarui informasi saldo
                             $('#saldo').text(kuki.user.saldo);
+                            // reset form
                             form[0].reset();
+
+                            $("html, body").animate({ scrollTop: 0 }, "slow");
                         },
                         error: function (er) {
                             console.log(er)

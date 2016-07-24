@@ -88,6 +88,7 @@
             },
 
             submitHandler: function (form) {
+                // Kirim request untuk mendapatkan token
                 $.ajax({
                     url: "http://localhost:8080/api-auth2/",
                     type: "POST",
@@ -96,16 +97,18 @@
                         username: document.getElementById('id').value,
                         password: document.getElementById('password').value
                     },
-                    success: function (data) {
+                    success: function (data) { // username dan password sesuai
+                        // atur kuki
                         Cookies.set('credential', data, { expires: 7, path: 'localhost/epulsa-client' });
 
                         var username = null;
                         var user_type = null;
 
+                        // jika user tervalidasi sebagai bukan admin
                         if ("user" in data.user) {
                             username = data.user.user.username;
                             user_type = data.user.type;
-                        } else {
+                        } else { // jika user tervalidasi sebagai admin
                             username = data.user.username;
                             user_type = 1;
                         }
@@ -115,10 +118,12 @@
                             "&username=" + username + "&type=" + user_type +
                             "&token=" + data.token);
                     },
-                    error: function (er) {
+                    error: function (er) { // username dan password salah
+                        // tampilkan flash message dengan error didapat dari variabel er
                         flashmsg.find('#flash-message-span').text(er.responseJSON.__all__[0]);
                         flashmsg.show();
 
+                        // sembunyikan flash message setelah 4 detik
                         window.setTimeout(hideFlashMessage, 4000);
 
                         function hideFlashMessage() {

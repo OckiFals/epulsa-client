@@ -95,6 +95,23 @@ date_default_timezone_set('Asia/Jakarta');
                     <!-- / Calendar .box -->
 
                     <!-- small box -->
+                    <div class="small-box bg-blue">
+                        <div class="inner">
+                            <h3>Rp. 
+                                <span id="income"></span>
+                            </h3>
+
+                            <p>Income</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">More info <i
+                                class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                    <!-- /.box -->
+
+                    <!-- small box -->
                     <div class="small-box bg-green">
                         <div class="inner">
                             <h3>Rp. 
@@ -176,24 +193,30 @@ date_default_timezone_set('Asia/Jakarta');
         var loading_indicator = $('#load-animate');
         var kuki = Cookies.getJSON('credential');
         $('#saldo').text(kuki.user.saldo);
+        $('#income').text(kuki.user.income);
 
+        // panggil fungsi orderStreams() setiap 1 detik
         var interval = window.setInterval(function(){orderStreams()}, 1000);
 
+        // fungsi untuk mendapatkan order baru secara real-time
         function orderStreams() {
             $.ajax({
-                url: 'http://localhost:8080/order/streams/',
+                url: 'http://localhost:8080/order/streams/', // alamat untuk order stream
                 headers: {
                     Authorization: "JWT " + kuki.token 
                 },
                 dataType: 'json',
                 success: function (data) {
                     console.log('sent request')
+                    // jika ada order baru
                     if (0 != data.length) {
+                        // siapkan modal notifikasi order
                         modal.find("#order-id").text(data[data.length-1].id);
                         modal.find("#customer-id").text(data[data.length-1].customer);
                         modal.find("#order-purchase").text(data[data.length-1].purchase);
-                        modal.modal('show');
+                        modal.modal('show'); // tampilkan model notifikasi order
 
+                        // tambah informasi order ke dalam tabel
                         window.setTimeout(function () {
                             $.each(data, function (index, obj) {
                                 order_table.row.add([
@@ -207,21 +230,26 @@ date_default_timezone_set('Asia/Jakarta');
                                     '<span class="label label-info">New</span>'
                                 ]).draw();
                             });
+                            // hapus node indikator loading
                             loading_indicator.remove();
                         }, 500);
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                        // hentikan orderStreams()
                         window.clearInterval(interval);
                     } else {
                         loading_indicator.remove();
                     }
                 },
-                error: function (er) {
+                error: function (er) { // jika error ketika pemanggilan AJAX
                     console.log(er)
                 }
             });
         }
 
+        // ketika buton ok di click -> counter menerima order
         modal.find('.btn-ok').click(function () {
             order_table.clear();
+            // buat transaksi baru
             $.ajax({
                 url: 'http://localhost:8080/transaction/order',
                 type: 'post',
@@ -233,11 +261,13 @@ date_default_timezone_set('Asia/Jakarta');
                 headers: {
                     Authorization: "JWT " + kuki.token 
                 },
-                success: function (data) {
+                success: function (data) { // jika sukses
                     kuki.user.saldo = parseInt(kuki.user.saldo) - parseInt(modal.find('#order-purchase').text());
+                    // perbarui informasi saldo
                     $('#saldo').text(kuki.user.saldo);
 
                     Cookies.remove('credential', { path: 'localhost/epulsa-client' });
+                    // atur ulang kuki
                     Cookies.set('credential', kuki, { expires: 7, path: 'localhost/epulsa-client' });
 
                     order_table.clear();

@@ -176,7 +176,7 @@
                     <!-- / menu untuk admin -->
                 <?php elseif (2 == $this->session->userdata('type')): ?>
                     <!--  menu  untuk counter -->
-                    <li <?php if ('Order' == $title) echo 'class="active"'?>>
+                    <li <?php if ('Transaksi' == $title) echo 'class="active"'?>>
                         <a href="<?php echo base_url('transaction/counter') ?>">
                             <i class="fa fa-file-text"></i>
                             <span>Transaksi</span>

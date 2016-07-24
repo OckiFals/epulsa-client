@@ -154,6 +154,8 @@ date_default_timezone_set('Asia/Jakarta');
         var kuki = Cookies.getJSON('credential');
         $('#saldo').text(kuki.user.saldo);
 
+        // mendapatkan data order terbaru
+        // akan kosong ketika order telah diterima konter
         $.ajax({
             url: 'http://localhost:8080/order/',
             headers: {

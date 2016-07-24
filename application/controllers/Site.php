@@ -81,8 +81,4 @@ class Site extends CI_Controller {
     public function order() {
         $this->load->view('order');
     }
-
-    public function transaction() {
-        $this->load->view('transaction');
-    }
 }

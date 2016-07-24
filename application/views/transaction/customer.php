@@ -2,7 +2,7 @@
 # set zona waktu lokal
 date_default_timezone_set('Asia/Jakarta');
 ?>
-<?php $this->load->view('header'); ?>
+<?php $this->load->view('header', ['title' => 'Transaksi']); ?>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -177,6 +177,7 @@ date_default_timezone_set('Asia/Jakarta');
         var kuki = Cookies.getJSON('credential');
         $('#saldo').text(kuki.user.saldo);
 
+        // mendapatkan transaksi oprder dari customer yang sedang login
         $.ajax({
             url: "http://localhost:8080/transaction/order?type=customer",
             headers: {
@@ -184,6 +185,7 @@ date_default_timezone_set('Asia/Jakarta');
             },
             success: function (data) {
                 window.setTimeout(function () {
+                    // isi data kedalam order table
                     $.each(data, function (index, obj) {
                         order_table.row.add([
                             // col 1

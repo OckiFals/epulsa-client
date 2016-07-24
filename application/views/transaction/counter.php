@@ -177,8 +177,10 @@ date_default_timezone_set('Asia/Jakarta');
         var kuki = Cookies.getJSON('credential');
         $('#saldo').text(kuki.user.saldo);
 
+        // panggil fungsi orderStreams() setiap 1 detik
         var interval = window.setInterval(function(){orderStreams()}, 1000);
 
+        // mendapatkan transaksi oprder dari conter
         $.ajax({
             url: "http://localhost:8080/transaction/order",
             headers: {
@@ -186,6 +188,7 @@ date_default_timezone_set('Asia/Jakarta');
             },
             success: function (data) {
                 window.setTimeout(function () {
+                    // isi data kedalam order table
                     $.each(data, function (index, obj) {
                         order_table.row.add([
                             // col 1
@@ -203,6 +206,8 @@ date_default_timezone_set('Asia/Jakarta');
                 window.clearInterval(interval);
             }
         });
+
+        // fungsi untuk mendapatkan order baru secara real-time
         function orderStreams() {
             $.ajax({
                 url: 'http://localhost:8080/order/streams/',
@@ -227,7 +232,9 @@ date_default_timezone_set('Asia/Jakarta');
             });
         }
 
+        // ketika buton ok di click -> counter menerima order
         modal.find('.btn-ok').click(function () {
+            // buat transaksi baru
             $.ajax({
                 url: 'http://localhost:8080/transaction/order',
                 type: 'post',

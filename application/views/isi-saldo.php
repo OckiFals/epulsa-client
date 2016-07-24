@@ -161,12 +161,15 @@
             // ambil data dari kuki
             var kuki = Cookies.getJSON('credential');
 
+            // dapatkan semua list customer
+            // digunakan pada form select dengan id="customer"
             $.ajax({
                 url: 'http://localhost:8080/user/customer/',      
                 headers: {
                     Authorization: "JWT " + kuki.token 
                 },
                 success: function (data) {
+                    // isi form select customer
                     $.each(data, function (index, obj) {
                         form.find('#customer').append($("<option></option>")
                             .attr("value", obj.id)
@@ -178,7 +181,9 @@
                 }
             });
 
+            // jika form sublit
             $(form).submit(function(e) {
+                // tahan operasi default
                 e.preventDefault();
             }).validate({
 
@@ -199,7 +204,7 @@
                 },
 
                 submitHandler: function (f) {
-                    // mendapatkan konter id yang dipilih secara bergantian
+                    // perbarui customer saldo
                     $.ajax({
                         url: 'http://localhost:8080/user/customer/' + $('#customer option:selected').val() + '/',
                         type: 'PUT',
@@ -210,6 +215,7 @@
                             Authorization: "JWT " + kuki.token 
                         },
                         success: function (data) {
+                            // tampilkan informasi
                             renderFlashInfo(data);
                         },
                         error: function (er) {
